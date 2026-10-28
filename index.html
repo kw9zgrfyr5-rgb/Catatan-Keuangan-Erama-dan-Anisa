@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Keuangan Anisa & Erama</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2830/2830284.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2830/2830284.png">    
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -107,6 +109,7 @@
                         <option value="Dompet Bersama">🏦 Bersama</option>
                         <option value="Pribadi Suami">👨 Erama</option>
                         <option value="Pribadi Istri">👩 Anisa</option>
+                        <option value="Adek Prana">👶 Prana</option>
                     </select>
                 </div>
                 <span id="totalItemText" class="text-[10px] font-bold text-slate-400 uppercase">0 Item</span>
@@ -149,6 +152,7 @@
                             <option value="Dompet Bersama">🏦 Dompet Bersama</option>
                             <option value="Pribadi Suami">👨 Dompet Erama</option>
                             <option value="Pribadi Istri">👩 Dompet Anisa</option>
+                            <option value="Adek Prana">👶 Dompet Adek Prana</option>
                         </select>
                     </div>
                     <div>
@@ -197,7 +201,7 @@
         let daftarTransaksi = [];
         const daftarKategori = ['Jajan', 'Makan', 'Bensin', 'Sosial', 'Rumah Tangga', 'Belanja', 'Liburan', 'Lain-lain'];
         const ikonKategori = { 'Jajan': '🍿', 'Makan': '🍔', 'Bensin': '⛽', 'Sosial': '🤝', 'Rumah Tangga': '🏠', 'Belanja': '🛍️', 'Liburan': '✈️', 'Lain-lain': '🌀', 'Pemasukan': '💰' };
-        const ikonDompet = { 'Dompet Bersama': '🏦', 'Pribadi Suami': '👨', 'Pribadi Istri': '👩' };
+        const ikonDompet = { 'Dompet Bersama': '🏦', 'Pribadi Suami': '👨', 'Pribadi Istri': '👩', 'Adek Prana': '👶' };
 
         const ctx = document.getElementById('grafikKategori').getContext('2d');
         const grafik = new Chart(ctx, {
