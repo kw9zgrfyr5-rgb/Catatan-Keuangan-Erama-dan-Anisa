@@ -101,7 +101,7 @@
                 </div>
             </div>
 
-            <!-- DAFTAR RIWAYAT TRANSAKSI -->
+            <!-- DAFTAR RIWAYAT MUTASI (ALA MOBILE BANKING) -->
             <div class="bg-white rounded-2xl shadow-xs border border-slate-100 overflow-hidden">
                 <div class="p-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2">
@@ -118,7 +118,8 @@
                     </div>
                     <span id="totalItemText" class="text-[10px] font-bold text-slate-400 uppercase">0 Item</span>
                 </div>
-                <div id="mobileList" class="divide-y divide-slate-100 p-3 space-y-2"></div>
+                <!-- CONTAINER MUTASI HARIAN -->
+                <div id="mobileList" class="p-3 space-y-3"></div>
             </div>
         </div>
 
@@ -217,7 +218,7 @@
                     </div>
                 </div>
 
-                <!-- CHECKBOX ZAKAT (Hanya muncul jika Pemasukan) -->
+                <!-- CHECKBOX ZAKAT -->
                 <div id="containerZakatCheck" class="hidden p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2.5">
                     <input type="checkbox" id="hitungZakat" class="w-4 h-4 text-emerald-600 rounded border-emerald-300 focus:ring-emerald-500 cursor-pointer">
                     <label for="hitungZakat" class="text-xs font-bold text-emerald-800 cursor-pointer">
@@ -283,7 +284,7 @@
 
     <script>
         // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT BARU DI SINI
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCtnsRG2pJee9btZSAiOOFMf26luxVd92PnvD-4OseZ8qol5f66umdfmYQ2KvtozMG7A/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw4FvKK-mAZ9tlN7lsOw9oEn0JCf0LIA8oGLJQibxw4DcwEzUae2javNM7SSQ_3x4nIUA/exec"; 
 
         let daftarTransaksi = [];
         let daftarPenyaluranZakat = [];
@@ -309,7 +310,7 @@
             const absNominal = Math.abs(parseInt(angka));
             return 'Rp ' + absNominal.toLocaleString('id-ID'); 
         }
-        function formatTanggalIndo(tglStr) { return new Date(tglStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }); }
+        function formatTanggalIndo(tglStr) { return new Date(tglStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); }
         function dapatkanBulanTahun(tanggalStr) { return new Date(tanggalStr).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }); }
         function showLoading(status) { document.getElementById('loading').classList.toggle('hidden', !status); }
         
@@ -401,6 +402,7 @@
             let dataGrafik = [0, 0, 0, 0, 0, 0, 0, 0];
             let hitungItem = 0;
 
+            let transaksiFiltered = [];
             daftarTransaksi.forEach(function(t, index) {
                 const blnTx = dapatkanBulanTahun(t.tanggal);
                 const cocokBulan = (filterBulan === "Semua" || filterBulan === blnTx);
@@ -419,34 +421,73 @@
                         if (idx !== -1) dataGrafik[idx] += nilai;
                     }
 
-                    const warnaTeksJumlah = apakahPemasukan ? "text-emerald-600 font-bold" : "text-slate-800 font-bold";
-                    const tandaDiferensiasi = apakahPemasukan ? "+ " : "- ";
-                    const badgeZakat = (t.zakat === "Ya") ? `<span class="bg-emerald-100 text-emerald-700 text-[8px] px-1.5 py-0.5 rounded font-bold ml-1">Zakat 2.5%</span>` : '';
-
-                    const card = document.createElement('div');
-                    card.className = "flex justify-between items-center py-2 bg-white transition";
-                    card.innerHTML = `
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-sm flex-shrink-0 border border-slate-100">
-                                ${ikonKategori[t.kategori] || '💰'}
-                            </div>
-                            <div class="min-w-0">
-                                <div class="font-bold text-slate-800 text-xs truncate flex items-center">
-                                    ${t.keperluan} ${badgeZakat}
-                                </div>
-                                <div class="text-[9px] text-slate-400 font-semibold mt-0.5">
-                                    ${formatTanggalIndo(t.tanggal)} • ${ikonDompet[t.dompet] || '💳'} ${t.dompet.replace("Pribadi ", "")}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 flex-shrink-0">
-                            <div class="${warnaTeksJumlah} text-xs sm:text-sm text-right">${tandaDiferensiasi}${formatRupiah(nilai)}</div>
-                            <button onclick="hapusTransaksi(${index})" class="text-slate-300 hover:text-rose-500 p-1.5 text-xs transition cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
-                        </div>
-                    `;
-                    mobileList.appendChild(card);
+                    transaksiFiltered.push({ ...t, indexAsli: index, nilaiAsli: nilai, apakahPemasukan });
                 }
             });
+
+            let groupedByDate = {};
+            transaksiFiltered.forEach(t => {
+                if (!groupedByDate[t.tanggal]) {
+                    groupedByDate[t.tanggal] = { items: [], totalMasukHariIni: 0, totalKeluarHariIni: 0 };
+                }
+                groupedByDate[t.tanggal].items.push(t);
+                if (t.apakahPemasukan) {
+                    groupedByDate[t.tanggal].totalMasukHariIni += Math.abs(t.nilaiAsli);
+                } else {
+                    groupedByDate[t.tanggal].totalKeluarHariIni += t.nilaiAsli;
+                }
+            });
+
+            for (let tanggal in groupedByDate) {
+                const dataHari = groupedByDate[tanggal];
+                
+                const groupDiv = document.createElement('div');
+                groupDiv.className = "bg-slate-50 border border-slate-100 rounded-xl p-3 space-y-2";
+                
+                let ringkasanHariHtml = `<div class="flex justify-between items-center pb-2 border-b border-slate-200/60 text-[11px]">
+                    <span class="font-bold text-slate-700"><i class="fa-regular fa-calendar text-blue-600 mr-1"></i> ${formatTanggalIndo(tanggal)}</span>
+                    <div class="flex gap-2 text-[10px] font-semibold">`;
+                if (dataHari.totalMasukHariIni > 0) {
+                    ringkasanHariHtml += `<span class="text-emerald-600">+${formatRupiah(dataHari.totalMasukHariIni)}</span>`;
+                }
+                if (dataHari.totalKeluarHariIni > 0) {
+                    ringkasanHariHtml += `<span class="text-rose-600">-${formatRupiah(dataHari.totalKeluarHariIni)}</span>`;
+                }
+                ringkasanHariHtml += `</div></div>`;
+
+                let itemsHtml = `<div class="divide-y divide-slate-100 space-y-1.5">`;
+                dataHari.items.forEach(t => {
+                    const warnaTeksJumlah = t.apakahPemasukan ? "text-emerald-600 font-bold" : "text-slate-800 font-bold";
+                    const tandaDiferensiasi = t.apakahPemasukan ? "+ " : "- ";
+                    const badgeZakat = (t.zakat === "Ya") ? `<span class="bg-emerald-100 text-emerald-700 text-[8px] px-1.5 py-0.5 rounded font-bold ml-1">Zakat 2.5%</span>` : '';
+
+                    itemsHtml += `
+                        <div class="flex justify-between items-center pt-1.5">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <div class="w-7 h-7 rounded-full bg-white flex items-center justify-center text-xs flex-shrink-0 border border-slate-200 shadow-2xs">
+                                    ${ikonKategori[t.kategori] || '💰'}
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="font-bold text-slate-800 text-xs truncate flex items-center">
+                                        ${t.keperluan} ${badgeZakat}
+                                    </div>
+                                    <div class="text-[9px] text-slate-400 font-semibold">
+                                        ${ikonDompet[t.dompet] || '💳'} ${t.dompet.replace("Pribadi ", "")}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <div class="${warnaTeksJumlah} text-xs text-right">${tandaDiferensiasi}${formatRupiah(t.nilaiAsli)}</div>
+                                <button onclick="hapusTransaksi(${t.indexAsli})" class="text-slate-300 hover:text-rose-500 p-1 text-xs transition cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+                itemsHtml += `</div>`;
+
+                groupDiv.innerHTML = ringkasanHariHtml + itemsHtml;
+                mobileList.appendChild(groupDiv);
+            }
 
             document.getElementById('totalPemasukan').innerText = 'Rp ' + totalPemasukanBulanIni.toLocaleString('id-ID');
             document.getElementById('totalPengeluaranCard').innerText = '-Rp ' + totalPengeluaranBulanIni.toLocaleString('id-ID');
@@ -467,7 +508,6 @@
             let totalZakatKumpul = 0;
             let totalZakatDisalurkan = 0;
 
-            // Hitung total zakat terkumpul dari pemasukan yang ber-status "Ya" (2.5% dari nominal)
             daftarTransaksi.forEach(t => {
                 if (t.zakat === "Ya") {
                     const nominalPemasukan = Math.abs(parseInt(t.jumlah || 0));
@@ -475,7 +515,6 @@
                 }
             });
 
-            // Hitung total zakat yang sudah disalurkan
             daftarPenyaluranZakat.forEach((z, idx) => {
                 const nominalSalur = parseInt(z.nominal || 0);
                 totalZakatDisalurkan += nominalSalur;
