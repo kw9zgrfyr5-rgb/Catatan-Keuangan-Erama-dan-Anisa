@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Keuangan Anisa & Erama</title>
     
-    <!-- IKON APLIKASI UNTUK LAYAR HP (Biar tidak "K" polos lagi) -->
+    <!-- IKON APLIKASI -->
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2830/2830284.png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2830/2830284.png">
 
@@ -28,9 +28,8 @@
                 <span class="font-black tracking-wider text-sm">Finansialku</span>
             </div>
             <div class="flex items-center gap-4 text-xs font-medium text-blue-100">
-                <span class="hover:text-white cursor-pointer"><i class="fa-solid fa-house mr-1"></i>Home</span>
-                <span class="hover:text-white cursor-pointer"><i class="fa-solid fa-headset mr-1"></i>Support</span>
-                <span class="hover:text-white cursor-pointer"><i class="fa-solid fa-user mr-1"></i>Akun</span>
+                <span onclick="gantiTab('home')" id="navHomeText" class="hover:text-white cursor-pointer font-bold underline"><i class="fa-solid fa-house mr-1"></i>Home</span>
+                <span onclick="gantiTab('zakat')" id="navZakatText" class="hover:text-white cursor-pointer"><i class="fa-solid fa-hand-holding-heart mr-1"></i>Zakat</span>
             </div>
         </div>
     </header>
@@ -45,85 +44,128 @@
             </div>
         </div>
 
-        <!-- KARTU SALDO MENGAMBANG -->
-        <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-100 space-y-3">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-2.5">
-                <span class="text-xs text-slate-400 font-medium">Pemasukan</span>
-                <span id="totalPemasukan" class="text-xs sm:text-sm font-bold text-slate-700">Rp 0</span>
+        <!-- ================= HALAMAN HOME ================= -->
+        <div id="viewHome" class="space-y-4">
+            <!-- KARTU SALDO MENGAMBANG -->
+            <div class="bg-white p-5 rounded-2xl shadow-lg border border-slate-100 space-y-3">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-2.5">
+                    <span class="text-xs text-slate-400 font-medium">Pemasukan</span>
+                    <span id="totalPemasukan" class="text-xs sm:text-sm font-bold text-slate-700">Rp 0</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-slate-100 pb-2.5">
+                    <span class="text-xs text-slate-400 font-medium">Pengeluaran</span>
+                    <span id="totalPengeluaranCard" class="text-xs sm:text-sm font-bold text-rose-600">-Rp 0</span>
+                </div>
+                <div class="flex justify-between items-center pt-1">
+                    <span class="text-xs text-blue-600 font-bold uppercase tracking-wider">Saldo Saat Ini</span>
+                    <span id="sisaSaldo" class="text-base sm:text-lg font-black text-blue-600">Rp 0</span>
+                </div>
             </div>
-            <div class="flex justify-between items-center border-b border-slate-100 pb-2.5">
-                <span class="text-xs text-slate-400 font-medium">Pengeluaran</span>
-                <span id="totalPengeluaranCard" class="text-xs sm:text-sm font-bold text-rose-600">-Rp 0</span>
+
+            <!-- MENU GRID IKON -->
+            <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-100 grid grid-cols-4 gap-3 text-center">
+                <button onclick="toggleModalForm(true)" class="flex flex-col items-center gap-1.5 group cursor-pointer">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg group-hover:bg-blue-600 group-hover:text-white transition shadow-2xs">
+                        <i class="fa-solid fa-file-pen"></i>
+                    </div>
+                    <span class="text-[10px] font-semibold text-slate-600">Catat</span>
+                </button>
+                <button onclick="gantiTab('zakat')" class="flex flex-col items-center gap-1.5 group cursor-pointer">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg group-hover:bg-emerald-600 group-hover:text-white transition shadow-2xs">
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+                    </div>
+                    <span class="text-[10px] font-semibold text-slate-600">Zakat</span>
+                </button>
+                <button onclick="document.getElementById('filterDompet').focus()" class="flex flex-col items-center gap-1.5 group cursor-pointer">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg group-hover:bg-amber-600 group-hover:text-white transition shadow-2xs">
+                        <i class="fa-solid fa-vault"></i>
+                    </div>
+                    <span class="text-[10px] font-semibold text-slate-600">Dompet</span>
+                </button>
+                <button onclick="resetDataTotal()" class="flex flex-col items-center gap-1.5 group cursor-pointer">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg group-hover:bg-rose-600 group-hover:text-white transition shadow-2xs">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </div>
+                    <span class="text-[10px] font-semibold text-slate-600">Reset</span>
+                </button>
             </div>
-            <div class="flex justify-between items-center pt-1">
-                <span class="text-xs text-blue-600 font-bold uppercase tracking-wider">Saldo Saat Ini</span>
-                <span id="sisaSaldo" class="text-base sm:text-lg font-black text-blue-600">Rp 0</span>
+
+            <!-- RINGKASAN GRAFIK KECIL -->
+            <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-xs font-bold text-slate-800">Proporsi Pengeluaran</h3>
+                    <p class="text-[10px] text-slate-400">Berdasarkan kategori bulan ini.</p>
+                </div>
+                <div class="w-16 h-16 flex-shrink-0">
+                    <canvas id="grafikKategori"></canvas>
+                </div>
+            </div>
+
+            <!-- DAFTAR RIWAYAT TRANSAKSI -->
+            <div class="bg-white rounded-2xl shadow-xs border border-slate-100 overflow-hidden">
+                <div class="p-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <select id="filterBulan" class="p-1 text-[11px] border border-slate-200 rounded-lg bg-white font-medium focus:outline-blue-500">
+                            <option value="Semua">Semua Bulan</option>
+                        </select>
+                        <select id="filterDompet" class="p-1 text-[11px] border border-slate-200 rounded-lg bg-white font-medium focus:outline-blue-500">
+                            <option value="Semua">Semua Dompet</option>
+                            <option value="Dompet Bersama">🏦 Bersama</option>
+                            <option value="Pribadi Suami">👨 Erama</option>
+                            <option value="Pribadi Istri">👩 Anisa</option>
+                            <option value="Adek Prana">👶 Prana</option>
+                        </select>
+                    </div>
+                    <span id="totalItemText" class="text-[10px] font-bold text-slate-400 uppercase">0 Item</span>
+                </div>
+                <div id="mobileList" class="divide-y divide-slate-100 p-3 space-y-2"></div>
             </div>
         </div>
 
-        <!-- MENU GRID IKON -->
-        <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-100 grid grid-cols-4 gap-3 text-center">
-            <button onclick="toggleModalForm(true)" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg group-hover:bg-blue-600 group-hover:text-white transition shadow-2xs">
-                    <i class="fa-solid fa-file-pen"></i>
+        <!-- ================= HALAMAN ZAKAT ================= -->
+        <div id="viewZakat" class="hidden space-y-4">
+            <!-- KARTU RINGKASAN ZAKAT -->
+            <div class="bg-gradient-to-br from-emerald-600 to-teal-700 text-white p-5 rounded-2xl shadow-lg space-y-3">
+                <div class="flex justify-between items-center border-b border-emerald-500/40 pb-2.5">
+                    <span class="text-xs text-emerald-100 font-medium">Total Zakat Terkumpul (2,5%)</span>
+                    <span id="zakatTotalKumpul" class="text-sm sm:text-base font-bold">Rp 0</span>
                 </div>
-                <span class="text-[10px] font-semibold text-slate-600">Catat</span>
-            </button>
-            <button onclick="document.getElementById('filterDompet').focus()" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg group-hover:bg-amber-600 group-hover:text-white transition shadow-2xs">
-                    <i class="fa-solid fa-vault"></i>
+                <div class="flex justify-between items-center border-b border-emerald-500/40 pb-2.5">
+                    <span class="text-xs text-emerald-100 font-medium">Sudah Disalurkan</span>
+                    <span id="zakatTotalDisalurkan" class="text-sm sm:text-base font-bold text-amber-300">Rp 0</span>
                 </div>
-                <span class="text-[10px] font-semibold text-slate-600">Dompet</span>
-            </button>
-            <button onclick="document.getElementById('filterBulan').focus()" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg group-hover:bg-emerald-600 group-hover:text-white transition shadow-2xs">
-                    <i class="fa-solid fa-calendar-days"></i>
+                <div class="flex justify-between items-center pt-1">
+                    <span class="text-xs text-white font-bold uppercase tracking-wider">Sisa Zakat Siap Salur</span>
+                    <span id="zakatSisaSalur" class="text-base sm:text-lg font-black text-amber-300">Rp 0</span>
                 </div>
-                <span class="text-[10px] font-semibold text-slate-600">Bulanan</span>
-            </button>
-            <button onclick="resetDataTotal()" class="flex flex-col items-center gap-1.5 group cursor-pointer">
-                <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg group-hover:bg-rose-600 group-hover:text-white transition shadow-2xs">
-                    <i class="fa-solid fa-rotate-right"></i>
-                </div>
-                <span class="text-[10px] font-semibold text-slate-600">Reset</span>
-            </button>
-        </div>
-
-        <!-- RINGKASAN GRAFIK KECIL -->
-        <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between gap-4">
-            <div>
-                <h3 class="text-xs font-bold text-slate-800">Proporsi Pengeluaran</h3>
-                <p class="text-[10px] text-slate-400">Berdasarkan kategori bulan ini.</p>
-            </div>
-            <div class="w-16 h-16 flex-shrink-0">
-                <canvas id="grafikKategori"></canvas>
-            </div>
-        </div>
-
-        <!-- DAFTAR RIWAYAT TRANSAKSI -->
-        <div class="bg-white rounded-2xl shadow-xs border border-slate-100 overflow-hidden">
-            <div class="p-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
-                    <select id="filterBulan" class="p-1 text-[11px] border border-slate-200 rounded-lg bg-white font-medium focus:outline-blue-500">
-                        <option value="Semua">Semua Bulan</option>
-                    </select>
-                    <select id="filterDompet" class="p-1 text-[11px] border border-slate-200 rounded-lg bg-white font-medium focus:outline-blue-500">
-                        <option value="Semua">Semua Dompet</option>
-                        <option value="Dompet Bersama">🏦 Bersama</option>
-                        <option value="Pribadi Suami">👨 Erama</option>
-                        <option value="Pribadi Istri">👩 Anisa</option>
-                        <option value="Adek Prana">👶 Prana</option>
-                    </select>
-                </div>
-                <span id="totalItemText" class="text-[10px] font-bold text-slate-400 uppercase">0 Item</span>
+                <button onclick="toggleModalZakat(true)" class="w-full bg-white text-emerald-700 font-bold py-2.5 rounded-xl shadow-md transition hover:bg-emerald-50 flex items-center justify-center gap-1.5 text-xs cursor-pointer mt-2">
+                    <i class="fa-solid fa-hands-holding-child"></i> Salurkan Zakat
+                </button>
             </div>
 
-            <!-- CONTAINER LIST -->
-            <div id="mobileList" class="divide-y divide-slate-100 p-3 space-y-2"></div>
+            <!-- EDUKASI ZAKAT PENGHASILAN -->
+            <div class="bg-white p-4 rounded-2xl shadow-xs border border-slate-100 space-y-2">
+                <h3 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-info text-emerald-600"></i> Panduan Singkat Zakat Penghasilan
+                </h3>
+                <p class="text-[11px] text-slate-500 leading-relaxed">
+                    Zakat profesi/penghasilan dikeluarkan sebesar <strong class="text-slate-700">2,5%</strong> dari pendapatan bersih atau kotor setiap kali menerima honor/gaji, jika telah mencapai nisab (setara 85 gram emas per tahun). Melalui aplikasi ini, centang opsi zakat saat mencatat pemasukan agar otomatis terakumulasi di sini!
+                </p>
+            </div>
+
+            <!-- RIWAYAT PENYALURAN ZAKAT -->
+            <div class="bg-white rounded-2xl shadow-xs border border-slate-100 overflow-hidden">
+                <div class="p-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-history mr-1"></i> Riwayat Penyaluran Zakat</span>
+                    <span id="totalZakatItemText" class="text-[10px] font-bold text-slate-400 uppercase">0 Penyaluran</span>
+                </div>
+                <div id="zakatListContainer" class="divide-y divide-slate-100 p-3 space-y-2"></div>
+            </div>
         </div>
+
     </div>
 
-    <!-- MODAL POPUP FORM INPUT -->
+    <!-- MODAL POPUP FORM INPUT TRANSAKSI -->
     <div id="formModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-end justify-center transition-all">
         <div class="bg-white w-full max-w-md rounded-t-3xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -171,8 +213,16 @@
                     </div>
                     <div class="col-span-2">
                         <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Keterangan</label>
-                        <input type="text" id="keperluan" placeholder="Misal: Beli susu / popok" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs" required>
+                        <input type="text" id="keperluan" placeholder="Misal: Gaji bulanan / Honor" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs" required>
                     </div>
+                </div>
+
+                <!-- CHECKBOX ZAKAT (Hanya muncul jika Pemasukan) -->
+                <div id="containerZakatCheck" class="hidden p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2.5">
+                    <input type="checkbox" id="hitungZakat" class="w-4 h-4 text-emerald-600 rounded border-emerald-300 focus:ring-emerald-500 cursor-pointer">
+                    <label for="hitungZakat" class="text-xs font-bold text-emerald-800 cursor-pointer">
+                        Hitung sebagai Objek Zakat Penghasilan (2,5%)
+                    </label>
                 </div>
 
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-1.5 text-xs cursor-pointer mt-2">
@@ -182,26 +232,62 @@
         </div>
     </div>
 
+    <!-- MODAL POPUP PENYALURAN ZAKAT -->
+    <div id="modalZakat" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-end justify-center transition-all">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-5 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-hand-holding-heart text-emerald-600"></i> Catat Penyaluran Zakat
+                </h3>
+                <button onclick="toggleModalZakat(false)" class="text-slate-400 hover:text-slate-600 p-1 text-sm cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <form id="formPenyaluranZakat" class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tanggal Penyaluran</label>
+                    <input type="date" id="zakatTanggal" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs" required>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nominal Disalurkan (Rp)</label>
+                    <input type="number" id="zakatNominal" placeholder="Contoh: 150000" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs" required>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tujuan Penyaluran</label>
+                    <input type="text" id="zakatTujuan" placeholder="Misal: Baznas / Fakir Miskin RW 06 / TPQ" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs" required>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Catatan (Opsional)</label>
+                    <input type="text" id="zakatCatatan" placeholder="Misal: Penyaluran bulan November" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-1.5 text-xs cursor-pointer mt-2">
+                    <i class="fa-solid fa-check"></i> Simpan Penyaluran Zakat
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- BOTTOM NAVIGATION BAR -->
     <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-2 px-6 flex justify-around items-center z-40 max-w-md mx-auto shadow-lg">
-        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex flex-col items-center text-blue-600 gap-0.5 cursor-pointer">
+        <button onclick="gantiTab('home')" class="flex flex-col items-center text-blue-600 gap-0.5 cursor-pointer">
             <i class="fa-solid fa-house text-base"></i>
             <span class="text-[9px] font-bold">Home</span>
         </button>
         <button onclick="toggleModalForm(true)" class="flex flex-col items-center text-white bg-blue-600 w-12 h-12 rounded-full -mt-6 shadow-md justify-center text-lg hover:bg-blue-700 transition cursor-pointer border-4 border-white">
             <i class="fa-solid fa-plus"></i>
         </button>
-        <button onclick="alert('Fitur Laporan Bulanan akan hadir di pembaruan berikutnya!')" class="flex flex-col items-center text-slate-400 hover:text-blue-600 gap-0.5 cursor-pointer">
-            <i class="fa-solid fa-chart-pie text-base"></i>
-            <span class="text-[9px] font-medium">Laporan</span>
+        <button onclick="gantiTab('zakat')" class="flex flex-col items-center text-slate-400 hover:text-emerald-600 gap-0.5 cursor-pointer">
+            <i class="fa-solid fa-hand-holding-heart text-base"></i>
+            <span class="text-[9px] font-medium">Zakat</span>
         </button>
     </div>
 
     <script>
-        // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzua4xTJBLO3GmdUEdkpt5aCnsZeqs_dPjSXn9g-Q-QGJrmwkA9H8CkQbyNYozF9PTl/exec"; 
+        // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT BARU DI SINI
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCtnsRG2pJee9btZSAiOOFMf26luxVd92PnvD-4OseZ8qol5f66umdfmYQ2KvtozMG7A/exec"; 
 
         let daftarTransaksi = [];
+        let daftarPenyaluranZakat = [];
+        
         const daftarKategori = ['Jajan', 'Makan', 'Bensin', 'Sosial', 'Rumah Tangga', 'Belanja', 'Liburan', 'Lain-lain'];
         const ikonKategori = { 'Jajan': '🍿', 'Makan': '🍔', 'Bensin': '⛽', 'Sosial': '🤝', 'Rumah Tangga': '🏠', 'Belanja': '🛍️', 'Liburan': '✈️', 'Lain-lain': '🌀', 'Pemasukan': '💰' };
         const ikonDompet = { 'Dompet Bersama': '🏦', 'Pribadi Suami': '👨', 'Pribadi Istri': '👩', 'Adek Prana': '👶' };
@@ -227,23 +313,45 @@
         function dapatkanBulanTahun(tanggalStr) { return new Date(tanggalStr).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }); }
         function showLoading(status) { document.getElementById('loading').classList.toggle('hidden', !status); }
         
+        function gantiTab(tab) {
+            const isHome = (tab === 'home');
+            document.getElementById('viewHome').classList.toggle('hidden', !isHome);
+            document.getElementById('viewZakat').classList.toggle('hidden', isHome);
+            
+            document.getElementById('navHomeText').className = isHome ? "hover:text-white cursor-pointer font-bold underline" : "hover:text-white cursor-pointer";
+            document.getElementById('navZakatText').className = !isHome ? "hover:text-white cursor-pointer font-bold underline" : "hover:text-white cursor-pointer";
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
         function toggleModalForm(buka) {
             document.getElementById('formModal').classList.toggle('hidden', !buka);
             if(buka) {
                 document.getElementById('tanggal').value = new Date().toISOString().split('T')[0];
+                sesuaiFormKategori();
+            }
+        }
+
+        function toggleModalZakat(buka) {
+            document.getElementById('modalZakat').classList.toggle('hidden', !buka);
+            if(buka) {
+                document.getElementById('zakatTanggal').value = new Date().toISOString().split('T')[0];
             }
         }
 
         function sesuaiFormKategori() {
             const jenis = document.getElementById('jenis').value;
             const selectKat = document.getElementById('kategori');
+            const containerZakat = document.getElementById('containerZakatCheck');
             selectKat.innerHTML = '';
             
             if (jenis === 'Pengeluaran') {
+                containerZakat.classList.add('hidden');
+                document.getElementById('hitungZakat').checked = false;
                 daftarKategori.forEach(k => {
                     selectKat.innerHTML += `<option value="${k}">${ikonKategori[k] || ''} ${k}</option>`;
                 });
             } else {
+                containerZakat.classList.remove('hidden');
                 selectKat.innerHTML = `<option value="Pemasukan">💰 Pemasukan</option>`;
             }
         }
@@ -253,10 +361,17 @@
             showLoading(true);
             try {
                 const respon = await fetch(SCRIPT_URL);
-                daftarTransaksi = await respon.json();
+                const hasil = await respon.json();
+                
+                daftarTransaksi = hasil.transaksi || [];
+                daftarPenyaluranZakat = hasil.penyaluranZakat || [];
+
                 daftarTransaksi.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+                daftarPenyaluranZakat.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+
                 perbaruiDropdownBulan();
                 perbaruiTampilan();
+                perbaruiTampilanZakat();
             } catch (err) { console.error(err); } 
             finally { showLoading(false); }
         }
@@ -306,6 +421,7 @@
 
                     const warnaTeksJumlah = apakahPemasukan ? "text-emerald-600 font-bold" : "text-slate-800 font-bold";
                     const tandaDiferensiasi = apakahPemasukan ? "+ " : "- ";
+                    const badgeZakat = (t.zakat === "Ya") ? `<span class="bg-emerald-100 text-emerald-700 text-[8px] px-1.5 py-0.5 rounded font-bold ml-1">Zakat 2.5%</span>` : '';
 
                     const card = document.createElement('div');
                     card.className = "flex justify-between items-center py-2 bg-white transition";
@@ -315,7 +431,9 @@
                                 ${ikonKategori[t.kategori] || '💰'}
                             </div>
                             <div class="min-w-0">
-                                <div class="font-bold text-slate-800 text-xs truncate">${t.keperluan}</div>
+                                <div class="font-bold text-slate-800 text-xs truncate flex items-center">
+                                    ${t.keperluan} ${badgeZakat}
+                                </div>
                                 <div class="text-[9px] text-slate-400 font-semibold mt-0.5">
                                     ${formatTanggalIndo(t.tanggal)} • ${ikonDompet[t.dompet] || '💳'} ${t.dompet.replace("Pribadi ", "")}
                                 </div>
@@ -342,6 +460,51 @@
             grafik.update();
         }
 
+        function perbaruiTampilanZakat() {
+            const zakatListContainer = document.getElementById('zakatListContainer');
+            zakatListContainer.innerHTML = '';
+            
+            let totalZakatKumpul = 0;
+            let totalZakatDisalurkan = 0;
+
+            // Hitung total zakat terkumpul dari pemasukan yang ber-status "Ya" (2.5% dari nominal)
+            daftarTransaksi.forEach(t => {
+                if (t.zakat === "Ya") {
+                    const nominalPemasukan = Math.abs(parseInt(t.jumlah || 0));
+                    totalZakatKumpul += (nominalPemasukan * 0.025);
+                }
+            });
+
+            // Hitung total zakat yang sudah disalurkan
+            daftarPenyaluranZakat.forEach((z, idx) => {
+                const nominalSalur = parseInt(z.nominal || 0);
+                totalZakatDisalurkan += nominalSalur;
+
+                const card = document.createElement('div');
+                card.className = "flex justify-between items-center py-2 bg-white transition text-xs";
+                card.innerHTML = `
+                    <div class="min-w-0">
+                        <div class="font-bold text-slate-800 truncate"><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> ${z.tujuan}</div>
+                        <div class="text-[9px] text-slate-400 font-semibold mt-0.5">
+                            ${formatTanggalIndo(z.tanggal)} • ${z.catatan}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <div class="font-bold text-emerald-700 text-right">${formatRupiah(nominalSalur)}</div>
+                        <button onclick="hapusPenyaluranZakat(${idx})" class="text-slate-300 hover:text-rose-500 p-1.5 transition cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                `;
+                zakatListContainer.appendChild(card);
+            });
+
+            const sisaSalur = totalZakatKumpul - totalZakatDisalurkan;
+
+            document.getElementById('zakatTotalKumpul').innerText = formatRupiah(totalZakatKumpul);
+            document.getElementById('zakatTotalDisalurkan').innerText = formatRupiah(totalZakatDisalurkan);
+            document.getElementById('zakatSisaSalur').innerText = (sisaSalur < 0 ? 'Rp 0' : formatRupiah(sisaSalur));
+            document.getElementById('totalZakatItemText').innerText = daftarPenyaluranZakat.length + " Penyaluran";
+        }
+
         document.getElementById('filterBulan').addEventListener('change', perbaruiTampilan);
         document.getElementById('filterDompet').addEventListener('change', perbaruiTampilan);
 
@@ -349,6 +512,7 @@
             e.preventDefault();
             const jenis = document.getElementById('jenis').value;
             let inputJumlah = parseInt(document.getElementById('jumlah').value);
+            const isZakatChecked = document.getElementById('hitungZakat').checked;
             
             if (jenis === 'Pemasukan') { inputJumlah = -Math.abs(inputJumlah); }
 
@@ -357,7 +521,8 @@
                 jumlah: inputJumlah,
                 kategori: document.getElementById('kategori').value,
                 keperluan: document.getElementById('keperluan').value,
-                dompet: document.getElementById('dompet').value
+                dompet: document.getElementById('dompet').value,
+                zakat: (jenis === 'Pemasukan' && isZakatChecked) ? "Ya" : "Tidak"
             };
 
             daftarTransaksi.push(dataBaru);
@@ -365,6 +530,8 @@
             
             perbaruiDropdownBulan();
             perbaruiTampilan();
+            perbaruiTampilanZakat();
+            
             document.getElementById('formPengeluaran').reset();
             sesuaiFormKategori();
             toggleModalForm(false);
@@ -377,6 +544,31 @@
             });
         });
 
+        document.getElementById('formPenyaluranZakat').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const dataZakatBaru = {
+                action: "salurkan_zakat",
+                tanggal: document.getElementById('zakatTanggal').value,
+                nominal: parseInt(document.getElementById('zakatNominal').value),
+                tujuan: document.getElementById('zakatTujuan').value,
+                catatan: document.getElementById('zakatCatatan').value || "-"
+            };
+
+            daftarPenyaluranZakat.push(dataZakatBaru);
+            daftarPenyaluranZakat.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+
+            perbaruiTampilanZakat();
+            document.getElementById('formPenyaluranZakat').reset();
+            toggleModalZakat(false);
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataZakatBaru)
+            });
+        });
+
         async function hapusTransaksi(indexGlobal) {
             if(!confirm("Hapus catatan ini secara permanen?")) return;
             const target = daftarTransaksi[indexGlobal];
@@ -385,6 +577,7 @@
             daftarTransaksi.splice(indexGlobal, 1);
             perbaruiDropdownBulan();
             perbaruiTampilan();
+            perbaruiTampilanZakat();
 
             try {
                 await fetch(SCRIPT_URL, {
@@ -403,12 +596,38 @@
             finally { showLoading(false); }
         }
 
+        async function hapusPenyaluranZakat(indexZakat) {
+            if(!confirm("Hapus riwayat penyaluran zakat ini?")) return;
+            const target = daftarPenyaluranZakat[indexZakat];
+            showLoading(true);
+
+            daftarPenyaluranZakat.splice(indexZakat, 1);
+            perbaruiTampilanZakat();
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: "delete_zakat",
+                        tanggal: target.tanggal,
+                        nominal: target.nominal,
+                        tujuan: target.tujuan
+                    })
+                });
+            } catch (err) { console.error(err); } 
+            finally { showLoading(false); }
+        }
+
         async function resetDataTotal() {
-            if(!confirm("⚠️ Hapus TOTAL seluruh catatan keuangan di Google Sheets?")) return;
+            if(!confirm("⚠️ Hapus TOTAL seluruh catatan keuangan dan zakat di Google Sheets?")) return;
             showLoading(true);
             daftarTransaksi = [];
+            daftarPenyaluranZakat = [];
             perbaruiDropdownBulan();
             perbaruiTampilan();
+            perbaruiTampilanZakat();
             try {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
